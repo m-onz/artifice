@@ -1,0 +1,15 @@
+{
+  "name": "hallucinate",
+  "version": "1.0.0",
+  "description": "using generative ai image-to-video to hallucinate extended video sequences from a single source image",
+  "main": "hallucinate.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.2",
+    "replicate": "^0.25.1"
+  }
+}
