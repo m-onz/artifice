@@ -10,7 +10,7 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 
-const hallucinations = 1;
+const hallucinations = 50;
 
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
@@ -81,11 +81,14 @@ const downloadFile = async (url, filepath) => {
 };
 
 const getLastFrame = async (video, filename) => {
+  console.log('Getting last frame from', video);
   const data = fs.readFileSync(video);
+  console.log(`Read video file, size: ${data.length} bytes`);
   const base64 = data.toString('base64');
   const mimeType = 'image/png';
   const dataURI = `data:${mimeType};base64,${base64}`;
   try {
+    console.log('Sending request to Replicate API...');
     const output = await replicate.run(
       "fofr/video-to-frames:ad9374d1b385c86948506b3ad287af9fca23e796685221782d9baa2bc43f14a9", {
         input: {
@@ -95,7 +98,10 @@ const getLastFrame = async (video, filename) => {
         }
       }
     );
+    console.log(`Received output from API: ${JSON.stringify(output)}`);
+
     const lastURL = output[output.length - 1];
+    console.log(`Downloading last frame from URL: ${lastURL}`);
     await downloadFile(lastURL, filename);
   } catch (error) {
     console.error('Error getting the last frame:', error);
@@ -103,7 +109,9 @@ const getLastFrame = async (video, filename) => {
   }
 };
 
+
 const imageToVideo = async (image, filename) => {
+  console.log('using image ', image)
   const data = fs.readFileSync(image);
   const base64 = data.toString('base64');
   const mimeType = 'image/png';
@@ -115,11 +123,12 @@ const imageToVideo = async (image, filename) => {
           input_image: dataURI,
           // video_length: "25_frames_with_svd_xt",
           // sizing_strategy: "maintain_aspect_ratio",
-          motion_bucket_id: 127
+          motion_bucket_id: 33
           // frames_per_second: 30
         }
       }
     );
+    console.log(`Replicate API response: ${JSON.stringify(output)}`);
     await downloadFile(output, filename);
   } catch (error) {
     console.error('Error converting image to video:', error);
