@@ -1,53 +1,15 @@
 
-/*
-
-  hallucinate : m-onz
-
-  using generative ai image-to-video ML to hallucinate extended video sequences from an initial source image.
-
-  :
-
-  you will need an API key from replicate.com exported to a global variable:
-
-  export REPLICATE_API_TOKEN=r8_BRU**********************************
-
-  tested on debian linux
-
-  uses ffmpeg
-
-  this costs money to run *see replicate.com pricing
-
-  ::
-
-  npm i
-  export REPLICATE_API_TOKEN=r8_BRU**********************************
-  node hallucinate.js
-
-  ::
-
-  wait a long time!
-
-  ::
-
-  You should then eventually get an "output.mp4" with a complete sequence.
-
-  ::
-
-  this script does not do any cleanup of generated files so you need to manually delete them
-
-  ::
-
-*/
-
 const { exec, execSync } = require('child_process');
 const Replicate = require('replicate');
+const crypto = require('crypto');
+const mkdirp = require('mkdirp');
 const axios = require('axios');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
 
-const inputFile = './avatar.png';
-const hallucinations = 5;
+// const inputFile = './90s.jpg';
+const hallucinations = 50;
 
 function checkEnvironment() {
   if (os.platform() !== 'linux') {
@@ -81,10 +43,11 @@ const executeCommand = async (command, options) => {
 };
 
 const createFileListAndConcatenate = async () => {
-  const dataFolderPath = path.join(__dirname);
+  const dataFolderPath = path.join(__dirname, 'data');
+  const id = crypto.randomBytes(11).toString('hex')
   try {
     await executeCommand('ls *.mp4 | awk \'{print "file \'"\'"\'"$0"\'"\'"\'"}\' > filelist.txt', { cwd: dataFolderPath });
-    await executeCommand('ffmpeg -f concat -safe 0 -i filelist.txt -c copy output.mp4', { cwd: dataFolderPath });
+    await executeCommand('ffmpeg -f concat -safe 0 -i filelist.txt -c copy ../output/output'+id+'.mp4', { cwd: dataFolderPath });
     console.log('Concatenation completed successfully.');
   } catch (error) {
     console.error('An error occurred during concatenation:', error);
@@ -100,7 +63,6 @@ const downloadFile = async (url, filepath) => {
     const response = await axios.get(url, { responseType: 'stream' });
     const writer = fs.createWriteStream(filepath);
     response.data.pipe(writer);
-
     return new Promise((resolve, reject) => {
       writer.on('finish', () => resolve(checkFileReady(filepath)));
       writer.on('error', reject);
@@ -116,7 +78,6 @@ const getLastFrame = async (video, filename) => {
   const base64 = data.toString('base64');
   const mimeType = 'image/png';
   const dataURI = `data:${mimeType};base64,${base64}`;
-
   try {
     const output = await replicate.run(
       "fofr/video-to-frames:ad9374d1b385c86948506b3ad287af9fca23e796685221782d9baa2bc43f14a9", {
@@ -140,12 +101,14 @@ const imageToVideo = async (image, filename) => {
   const base64 = data.toString('base64');
   const mimeType = 'image/png';
   const dataURI = `data:${mimeType};base64,${base64}`;
-
   try {
     const output = await replicate.run(
       "stability-ai/stable-video-diffusion:3f0457e4619daac51203dedb472816fd4af51f3149fa7a9e0b5ffcf1b8172438", {
         input: {
           input_image: dataURI,
+          video_length: "25_frames_with_svd_xt",
+          // sizing_strategy: "maintain_aspect_ratio",
+          motion_bucket_id: 55,
           frames_per_second: 11
         }
       }
@@ -154,23 +117,6 @@ const imageToVideo = async (image, filename) => {
   } catch (error) {
     console.error('Error converting image to video:', error);
     throw error;
-  }
-};
-
-const hallucinate = async (inputImage, iterations) => {
-  let currentImage = inputImage;
-  for (let i = 0; i < iterations; i++) {
-    const videoFilename = `./output_${i}.mp4`;
-    const imageFilename = `./last_frame_${i}.png`;
-
-    try {
-      await imageToVideo(currentImage, videoFilename);
-      await getLastFrame(videoFilename, imageFilename);
-      currentImage = imageFilename;
-    } catch (error) {
-      console.error(`Error in hallucinate iteration ${i}:`, error);
-      break;
-    }
   }
 };
 
@@ -200,10 +146,44 @@ const checkFileReady = (filePath, timeout = 30000, interval = 500) => {
   });
 };
 
-hallucinate(inputFile, hallucinations)
+const hallucinate = async (inputImage, iterations, imageIndex) => {
+  let currentImage = inputImage;
+  const hallucinationFolder = `./data/hallucination_${imageIndex}`;
+  mkdirp.sync(hallucinationFolder);
+  for (let i = 0; i < iterations; i++) {
+    const videoFilename = path.join(hallucinationFolder, `output_${i}.mp4`);
+    const imageFilename = path.join(hallucinationFolder, `last_frame_${i}.png`);
+    try {
+      await imageToVideo(currentImage, videoFilename);
+      await getLastFrame(videoFilename, imageFilename);
+      currentImage = imageFilename;
+    } catch (error) {
+      console.error(`Error in hallucinate iteration ${i}:`, error);
+      break;
+    }
+  }
+};
+
+const processImages = async (image_folder) => {
+  const images = listImageFiles(image_folder);
+  const hallucinatePromises = images.map((image, index) => hallucinate(image, hallucinations, index));
+  try {
+    await Promise.all(hallucinatePromises);
+    console.log('All images processed.');
+  } catch (error) {
+    console.error('An error occurred during image processing:', error);
+  }
+};
+
+const listImageFiles = (folderPath) => {
+  return fs.readdirSync(folderPath)
+           .filter(file => /\.(png|jpe?g)$/i.test(file))
+           .map(file => path.join(folderPath, file));
+};
+
+processImages('./images')
   .then(() => {
-    console.log('Attempting concatenation...');
-    return createFileListAndConcatenate();
+    console.log('All images processed.');
   })
   .catch(error => {
     console.error('Hallucinate process failed:', error);
