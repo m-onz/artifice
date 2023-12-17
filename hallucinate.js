@@ -1,4 +1,6 @@
 
+// m-onz : hallucinate.js
+
 const { exec, execSync } = require('child_process');
 const Replicate = require('replicate');
 const crypto = require('crypto');
@@ -8,8 +10,7 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 
-// const inputFile = './90s.jpg';
-const hallucinations = 50;
+const hallucinations = 1;
 
 function checkEnvironment() {
   if (os.platform() !== 'linux') {
@@ -42,12 +43,11 @@ const executeCommand = async (command, options) => {
   });
 };
 
-const createFileListAndConcatenate = async () => {
-  const dataFolderPath = path.join(__dirname, 'data');
-  const id = crypto.randomBytes(11).toString('hex')
+const createFileListAndConcatenate = async (folderId) => {
+  const dataFolderPath = path.join(__dirname, 'data', folderId);
   try {
     await executeCommand('ls *.mp4 | awk \'{print "file \'"\'"\'"$0"\'"\'"\'"}\' > filelist.txt', { cwd: dataFolderPath });
-    await executeCommand('ffmpeg -f concat -safe 0 -i filelist.txt -c copy ../output/output'+id+'.mp4', { cwd: dataFolderPath });
+    await executeCommand(`ffmpeg -f concat -safe 0 -i filelist.txt -c copy output_finished.mp4`, { cwd: dataFolderPath });
     console.log('Concatenation completed successfully.');
   } catch (error) {
     console.error('An error occurred during concatenation:', error);
@@ -106,10 +106,10 @@ const imageToVideo = async (image, filename) => {
       "stability-ai/stable-video-diffusion:3f0457e4619daac51203dedb472816fd4af51f3149fa7a9e0b5ffcf1b8172438", {
         input: {
           input_image: dataURI,
-          video_length: "25_frames_with_svd_xt",
+          // video_length: "25_frames_with_svd_xt",
           // sizing_strategy: "maintain_aspect_ratio",
-          motion_bucket_id: 55,
-          frames_per_second: 11
+          motion_bucket_id: 33
+          // frames_per_second: 11
         }
       }
     );
@@ -124,7 +124,6 @@ const checkFileReady = (filePath, timeout = 30000, interval = 500) => {
   return new Promise((resolve, reject) => {
     let lastSize = -1;
     let totalTime = 0;
-
     const checkInterval = setInterval(() => {
       if (!fs.existsSync(filePath)) {
         totalTime += interval;
@@ -134,7 +133,6 @@ const checkFileReady = (filePath, timeout = 30000, interval = 500) => {
         }
         return;
       }
-
       const stats = fs.statSync(filePath);
       if (stats.size === lastSize) {
         clearInterval(checkInterval);
@@ -162,18 +160,24 @@ const hallucinate = async (inputImage, iterations, imageIndex) => {
       break;
     }
   }
+  return `hallucination_${imageIndex}`;
 };
 
 const processImages = async (image_folder) => {
   const images = listImageFiles(image_folder);
   const hallucinatePromises = images.map((image, index) => hallucinate(image, hallucinations, index));
+
   try {
-    await Promise.all(hallucinatePromises);
+    const folders = await Promise.all(hallucinatePromises);
+    for (const folder of folders) {
+      await createFileListAndConcatenate(folder);
+    }
     console.log('All images processed.');
   } catch (error) {
     console.error('An error occurred during image processing:', error);
   }
 };
+
 
 const listImageFiles = (folderPath) => {
   return fs.readdirSync(folderPath)
