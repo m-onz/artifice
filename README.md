@@ -3,15 +3,15 @@
 
 using generative ai image-to-video ML to hallucinate extended video sequences from a single source image.
 
-you will need an API key from replicate.com exported to a global variable:
-
-export REPLICATE_API_TOKEN=r8_BRU**********************************
+you will need an API key from replicate.com exported as an environment variable.
 
 tested on debian linux
 
 uses ffmpeg
 
 this costs money to run *see replicate.com pricing
+
+put your images in the ./images folder. mp4 output is in the output folder.
 
 ```sh
 sudo apt-get install ffmpeg
@@ -22,7 +22,3 @@ node hallucinate.js
 ```
 
 wait a long time!
-
-You should then eventually get an "output.mp4" with a complete sequence.
-
-this script does not do any clean up of generated files so you need to manually delete them.
