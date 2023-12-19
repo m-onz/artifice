@@ -46,8 +46,8 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 
-const inputFile = './avatar.png';
-const hallucinations = 5;
+const inputFile = './replicate.png';
+const hallucinations = 50;
 
 function checkEnvironment() {
   if (os.platform() !== 'linux') {
