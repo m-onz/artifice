@@ -1,7 +1,6 @@
 
 # hallucinate
 
-<img src="demo.gif" loading="defer" style="width:1024px!important;" />
 <img src="images/1.png" loading="defer" />
 <img src="images/2.png" loading="defer" />
 
@@ -63,3 +62,7 @@ You can use [this model](https://replicate.com/fofr/toolkit) to generate a .gif 
 ### more info
 
 [This is blog article I wrote](https://m-onz.net/articles/command-line-audio-visual-art.html) on making command line visual art that might be useful.
+
+### an example video
+
+You can see an example video of this output [here](https://m-onz.net/articles/more-hallucinations.html)
