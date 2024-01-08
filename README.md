@@ -26,7 +26,7 @@ node hallucinate.js
 
 wait a long time!
 
-# generating intial images
+# generating initial images
 
 You can add images to the `images` folder from any source. I used [this model](https://replicate.com/bamburaistudio/paper-texture)
 
