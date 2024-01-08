@@ -1,7 +1,13 @@
 
 # hallucinate
 
-<img src="demo.gif" loading="defer" style="width:100%;" />
+<style>
+animated-image {
+  width: 100%!important;
+}
+</style>
+
+<img src="demo.gif" loading="defer" style="width:100%!important;" />
 <img src="images/1.png" loading="defer" />
 <img src="images/2.png" loading="defer" />
 
