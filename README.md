@@ -26,7 +26,7 @@ node hallucinate.js
 
 wait a long time!
 
-# generating initial images
+### generating initial images
 
 You can add images to the `images` folder from any source. I used [this model](https://replicate.com/bamburaistudio/paper-texture)
 
@@ -50,3 +50,7 @@ const output = await replicate.run(
   }
 );
 ```
+
+### generate gifs
+
+You can use [this model](https://replicate.com/fofr/toolkit) to generate a .gif from an .mp4 video.
