@@ -1,6 +1,9 @@
 
 # hallucinate
 
+<img src="images/1.png" loading="defer" />
+<img src="images/2.png" loading="defer" />
+
 using generative ai image-to-video ML to hallucinate extended video sequences from a single source image.
 
 you will need an API key from replicate.com exported as an environment variable.

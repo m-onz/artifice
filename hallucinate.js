@@ -11,7 +11,6 @@ const fs = require('fs');
 const os = require('os');
 
 const hallucinations = 11;
-const motion = 7;
 
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
@@ -124,8 +123,6 @@ const imageToVideo = async (image, filename) => {
           image: dataURI,
           prompt: "shocking abstract 3D art in the style of andy warhol and francis bacon for a gallery that shocks the viewer exploring digital, glitch and modern culture, distorted abstract wireframe mesh forms",
           max_frames: 33
-          // guidance_scale: 9,
-          // num_inference_steps: 50
         }
       }
     );
@@ -195,9 +192,6 @@ const processImages = async (image_folder) => {
 
   try {
     const folders = await Promise.all(hallucinatePromises);
-    for (const folder of folders) {
-      await createFileListAndConcatenate(folder);
-    }
     console.log('All images processed.');
   } catch (error) {
     console.error('An error occurred during image processing:', error);
@@ -210,19 +204,14 @@ const listImageFiles = (folderPath) => {
            .map(file => path.join(folderPath, file));
 };
 
-// processImages('./images')
-//   .then(() => {
-//     console.log('All images processed.');
-//   })
-//   .catch(error => {
-//     console.error('Hallucinate process failed:', error);
-//   });
-
-
-var p = fs.readdirSync('./data').map(function (p) {
-  return createFileListAndConcatenate('./data/'+p)
-})
-
-Promise.all(p).then(console.log).catch(console.log)
-
-// createFileListAndConcatenate
+processImages('./images')
+  .then(() => {
+    console.log('All images processed.');
+    var p = fs.readdirSync('./data').map(function (p) {
+      return createFileListAndConcatenate('./data/'+p)
+    })
+    Promise.all(p).then(console.log).catch(console.log)
+  })
+  .catch(error => {
+    console.error('Hallucinate process failed:', error);
+  });
