@@ -4,15 +4,19 @@
 <img src="images/1.png" loading="defer" />
 <img src="images/2.png" loading="defer" />
 
+### about
+
 using generative ai image-to-video ML to hallucinate extended video sequences from a single source image.
 
-you will need an API key from replicate.com exported as an environment variable.
+you will need an API key from [replicate.com](https://replicate.com)  exported as an environment variable.
 
-tested on debian linux
+### dependencies
 
-uses ffmpeg
+tested on [debian linux](https://www.debian.org/)
 
-this costs money to run *see replicate.com pricing
+this requires [ffmpeg](https://ffmpeg.org/)
+
+this costs money to run *see [replicate.com](https://replicate.com) pricing
 
 put your images in the ./images folder. mp4 output is in the output folder.
 
