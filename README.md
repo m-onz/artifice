@@ -1,7 +1,7 @@
 
 # hallucinate
 
-<img src="demo.gif" loading="defer" style="width:100%!important;" />
+<img src="demo.gif" loading="defer" style="width:1024px!important;" />
 <img src="images/1.png" loading="defer" />
 <img src="images/2.png" loading="defer" />
 
