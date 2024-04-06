@@ -59,10 +59,6 @@ const output = await replicate.run(
 
 You can use [this model](https://replicate.com/fofr/toolkit) to generate a .gif from an .mp4 video.
 
-### more info
-
-[This is blog article I wrote](https://m-onz.net/articles/command-line-audio-visual-art.html) on making command line visual art that might be useful.
-
 ### an example video
 
-You can see an example video of this output [here](https://m-onz.net/articles/more-hallucinations.html)
+You can see an example video of this output [here](https://fakedac.net)
