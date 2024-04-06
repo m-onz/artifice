@@ -1,5 +1,5 @@
 
-# hallucinate
+# artifice
 
 <img src="images/1.png" loading="defer" />
 <img src="images/2.png" loading="defer" />
