@@ -61,4 +61,4 @@ You can use [this model](https://replicate.com/fofr/toolkit) to generate a .gif 
 
 ### an example video
 
-You can see an example video of this output [here](https://fakedac.net)
+You can see an example video of this output [here](https://m-onz.net/art)
