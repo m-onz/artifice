@@ -117,12 +117,14 @@ const imageToVideo = async (image, filename) => {
   const dataURI = `data:${mimeType};base64,${base64}`;
   try {
     const output = await replicate.run(
-      "ali-vilab/i2vgen-xl:5821a338d00033abaaba89080a17eb8783d9a17ed710a6b4246a18e0900ccad4",
+      "minimax/video-01",
       {
         input: {
-          image: dataURI,
+          // prompt: "...",
+          prompt_optimizer: true,
+          first_frame_image: dataURI,
           prompt: "shocking abstract 3D art in the style of andy warhol and francis bacon for a gallery that shocks the viewer exploring digital, glitch and modern culture, distorted abstract wireframe mesh forms",
-          max_frames: 33
+          // max_frames: 33
         }
       }
     );
